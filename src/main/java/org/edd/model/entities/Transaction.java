@@ -1,56 +1,72 @@
 package org.edd.model.entities;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 public class Transaction {
-    private String id;
-    private String accountNumber;
-    private BigDecimal amount;
-    private TransactionType type;
-    private LocalDateTime timestamp;
-
-    public enum TransactionType {
-        DEPOSIT, WITHDRAWAL, TRANSFER
+    public enum OperationType {
+        INSERT, SELECT, UPDATE, DELETE
     }
 
-    public String getId() {
-        return id;
+    private final OperationType type;
+    private final Record record;
+    private final LocalDateTime timestamp;
+    private final Map<String, Object> criteria;
+    private final List<Record> results;
+
+    // INSERT, UPDATE, DELETE
+    public Transaction(OperationType type, Record record) {
+        this.type = type;
+        this.record = record;
+        this.timestamp = LocalDateTime.now();
+        this.criteria = null;
+        this.results = null;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    // SELECT
+    public Transaction(Map<String, Object> criteria, List<Record> results) {
+        this.type = OperationType.SELECT;
+        this.record = null;
+        this.timestamp = LocalDateTime.now();
+        this.criteria = criteria;
+        this.results = results;
     }
 
-    public String getAccountNumber() {
-        return accountNumber;
-    }
-
-    public void setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public TransactionType getType() {
+    public OperationType getType() {
         return type;
     }
 
-    public void setType(TransactionType type) {
-        this.type = type;
+    public Record getRecord() {
+        return record;
     }
 
     public LocalDateTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
+    public Map<String, Object> getCriteria() {
+        return criteria;
+    }
+
+    public List<Record> getResults() {
+        return results;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Transaction[type=").append(type)
+                .append(", timestamp=").append(timestamp);
+
+        if (type == OperationType.SELECT) {
+            sb.append(", criteria=").append(criteria)
+                    .append(", results=").append(results != null ? results.size() : 0).append(" records");
+        } else {
+            sb.append(", record=").append(record != null ? record.getId() : "null");
+        }
+
+        sb.append("]");
+        return sb.toString();
     }
 }
