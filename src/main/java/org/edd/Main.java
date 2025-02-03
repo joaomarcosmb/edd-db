@@ -1,7 +1,10 @@
 package org.edd;
 
+import org.edd.view.BankCLI;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello, World!");
+        BankCLI northEastBank = new BankCLI();
+        northEastBank.run();
     }
 }
