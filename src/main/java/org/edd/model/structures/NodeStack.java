@@ -6,7 +6,7 @@ public class NodeStack {
     }
 
     public DataNode dataNode;
-    protected NodeStack next;
+    public NodeStack next;
     public ActionType actionType;
 
     public NodeStack(DataNode dataNode, ActionType actionType) {

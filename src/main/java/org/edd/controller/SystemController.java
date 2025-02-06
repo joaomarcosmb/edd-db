@@ -3,8 +3,8 @@ package org.edd.controller;
 import java.util.List;
 
 import org.edd.model.entities.Customer;
-import org.edd.model.structures.ActionsStack;
-import org.edd.model.structures.LinkedList;
+import org.edd.model.entities.ActionsStack;
+import org.edd.model.entities.LinkedList;
 import org.edd.model.structures.NodeList;
 import org.edd.model.structures.NodeStack;
 

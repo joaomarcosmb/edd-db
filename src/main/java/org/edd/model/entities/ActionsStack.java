@@ -1,6 +1,8 @@
-package org.edd.model.structures;
+package org.edd.model.entities;
 
-import org.edd.model.entities.Customer;
+import org.edd.model.structures.DataNode;
+import org.edd.model.structures.NodeList;
+import org.edd.model.structures.NodeStack;
 
 public class ActionsStack {
     protected NodeStack head;
