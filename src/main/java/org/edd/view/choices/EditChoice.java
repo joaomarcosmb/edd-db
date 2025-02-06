@@ -1,6 +1,7 @@
 package org.edd.view.choices;
 
 public class EditChoice {
+    /* NOTE: If we wanted to let you choose the type of edition */
     public static void main(String[] args) {
         System.out.println();
         System.out.println("Escolha o que deseja alterar:");

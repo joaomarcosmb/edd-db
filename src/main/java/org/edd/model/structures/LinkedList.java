@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.edd.model.entities.Customer;
 
-public class LinkedList<T> {
+public class LinkedList {
     protected NodeList head;
 
     public LinkedList() {
@@ -15,20 +15,21 @@ public class LinkedList<T> {
     public void add(Customer costume) {
         NodeList newNode = new NodeList(costume);
 
-        if (head == null) {
-            head = newNode;
-        } else {
-            NodeList temp = head;
-
-            while (temp.next != null) {
-                temp = temp.next;
-            }
-
-            temp.next = newNode;
+        if (this.head == null) {
+            this.head = newNode;
+            return;
         }
+
+        NodeList temp = this.head;
+
+        while (temp.next != null) {
+            temp = temp.next;
+        }
+
+        temp.next = newNode;
     }
 
-    public boolean remove(int id) {
+    public void remove(int id) {
         NodeList currentCustomer = this.head;
         NodeList previousCustomer = null;
 
@@ -38,7 +39,7 @@ public class LinkedList<T> {
         }
 
         if (currentCustomer == null) {
-            return false;
+            return;
         }
 
         if (previousCustomer == null) {
@@ -46,27 +47,38 @@ public class LinkedList<T> {
         } else {
             previousCustomer.next = currentCustomer.next;
         }
-
-        return true;
     }
 
-    public NodeList find(int id) {
-        NodeList temp = head;
+    public void addOfRollback(NodeList previousNode,Customer customer) {
+        NodeList backCustomer = new NodeList(customer);
 
-        while (temp != null) {
-            if (temp.customer.getId() == id) {
-                return temp;
-            }
+        if(previousNode == null){
+            this.add(customer);
+            return;
+        }
 
+        NodeList nextCurrentCustomer = previousNode.next;
+        previousNode.next = backCustomer;
+        backCustomer.next = nextCurrentCustomer;
+    }
+
+    public Customer getCustomerById(int id) {
+        NodeList temp = this.head;
+
+        if (temp == null || temp.customer.getId() == id) {
+            return temp == null ? null : temp.customer;
+        }
+
+        while (temp.next != null && temp.customer.getId() != id) {
             temp = temp.next;
         }
 
-        return null;
+        return temp.customer.getId() == id ? temp.customer : null;
     }
 
     public int size() {
         int count = 0;
-        NodeList temp = head;
+        NodeList temp = this.head;
 
         while (temp != null) {
             count++;
@@ -76,9 +88,32 @@ public class LinkedList<T> {
         return count;
     }
 
+    public NodeList getLastNode() {
+        NodeList temp = this.head;
+
+        while (temp != null) {
+            temp = temp.next;
+        }
+
+        return temp;
+
+    }
+
+    public NodeList getPreviousNode(int id) {
+        NodeList currentCustomer = this.head;
+        NodeList previousCustomer = null;
+
+        while (currentCustomer != null && currentCustomer.customer.getId() != id) {
+            previousCustomer = currentCustomer;
+            currentCustomer = currentCustomer.next;
+        }
+
+       return previousCustomer;
+    }
+
     public List<Customer> getAllNode() {
-        List<Customer> listCustomers = new ArrayList<Customer>();
-        NodeList temp = head;
+        List<Customer> listCustomers = new ArrayList<>();
+        NodeList temp = this.head;
 
         while (temp != null) {
             listCustomers.add(temp.customer);

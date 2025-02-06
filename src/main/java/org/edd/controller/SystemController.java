@@ -1,42 +1,104 @@
 package org.edd.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.edd.model.entities.Customer;
+import org.edd.model.structures.ActionsStack;
 import org.edd.model.structures.LinkedList;
 import org.edd.model.structures.NodeList;
+import org.edd.model.structures.NodeStack;
 
 public class SystemController {
-    private final LinkedList<NodeList> customers;
+    private final LinkedList linkedList;
+    private final ActionsStack actionStack;
 
     public SystemController() {
-        customers = new LinkedList<NodeList>();
+        this.linkedList = new LinkedList();
+        this.actionStack = new ActionsStack();
     }
 
-    public void addCustomer(int idCustomer, String nameCustomer,String cpfCustomer,String birthDateCustomer,String emailCustomer) {
+    public void addCustomer(String nameCustomer,String cpfCustomer,String birthDateCustomer,String emailCustomer) {
+        int idCustomer = this.findSize() + 1;
         Customer customer = new Customer(idCustomer, nameCustomer, cpfCustomer, birthDateCustomer, emailCustomer);
-        customers.add(customer);
+        NodeList lastOfList = this.linkedList.getLastNode();
+        this.actionStack.push(customer, lastOfList, NodeStack.ActionType.INSERT);
+        this.linkedList.add(customer);
     }
 
     public boolean removeCustomer(int id) {
-        return customers.remove(id);
+        Customer customer = this.linkedList.getCustomerById(id);
+
+        if(customer == null){
+            return false;
+        }
+
+        NodeList previousNode = this.linkedList.getPreviousNode(id);
+        this.actionStack.push(customer, previousNode, NodeStack.ActionType.DELETE);
+        this.linkedList.remove(id);
+
+        return true;
     }
 
-    public NodeList findCustomer(int id) {
-        return customers.find(id);
+    public boolean editCustomer(int id, String newName, String newCPF, String NewBirthDate, String newEmail, boolean isCreateNodeStack){
+        Customer customer = this.linkedList.getCustomerById(id);
+
+        if(customer == null){
+            return false;
+        }
+
+        if(isCreateNodeStack){
+            Customer oldCustomer = new Customer(customer.getId(), customer.getName(), customer.getCpf(), customer.getBirthDate(), customer.getEmail());
+            NodeList previousNode = this.linkedList.getPreviousNode(customer.getId());
+            this.actionStack.push(oldCustomer, previousNode, NodeStack.ActionType.UPDATE);
+        }
+
+        customer.setName(newName);
+        customer.setCpf(newCPF);
+        customer.setBirthDate(NewBirthDate);
+        customer.setEmail(newEmail);
+
+        return true;
+    }
+
+    public Customer getCostumeById(int id) {
+        return this.linkedList.getCustomerById(id);
     }
 
     public int findSize() {
-        return customers.size();
+        return this.linkedList.size();
+    }
+
+    public boolean rollbackStack(){
+        NodeStack topStack = this.actionStack.getTop();
+
+        if(topStack == null){
+            return false;
+        }
+
+        switch (topStack.actionType){
+            case INSERT:
+                this.linkedList.remove(topStack.dataNode.customer.getId());
+                break;
+
+            case UPDATE:
+                this.editCustomer(topStack.dataNode.customer.getId(), topStack.dataNode.customer.getName(), topStack.dataNode.customer.getCpf(), topStack.dataNode.customer.getBirthDate(), topStack.dataNode.customer.getEmail(), false);
+                break;
+
+            case DELETE:
+                this.linkedList.addOfRollback(topStack.dataNode.previousNode, topStack.dataNode.customer);
+                break;
+
+            default:
+                return false;
+        }
+
+        this.actionStack.pop();
+        return true;
     }
 
     public List<Customer> getAllCustomer () {
-        List<Customer> listCustomers = new ArrayList<Customer>();
-
-        listCustomers = customers.getAllNode();
-
+        List<Customer> listCustomers;
+        listCustomers = this.linkedList.getAllNode();
         return listCustomers;
     }
 }
-

@@ -2,10 +2,8 @@ package org.edd.view;
 
 import org.edd.controller.SystemController;
 import org.edd.model.entities.Customer;
-import org.edd.model.structures.NodeList;
 
 import org.edd.view.color.ColorANSI;
-import org.edd.view.choices.EditChoice;
 import org.edd.view.choices.HomeChoice;
 
 import java.util.List;
@@ -33,20 +31,19 @@ public class BankCLI extends ColorANSI {
     
                 switch (choice) {
                     case 1:
-                        addCustomer();
+                        this.addCustomer();
                         break;
                     case 2:
-                        /*TODO: fixbug remove sem id existente*/
-                        removeCustomer();
+                        this.removeCustomer();
                         break;
                     case 3:
-                        editCustomer();
+                        this.editCustomer();
                         break;
                     case 4:
-                        rollback();
+                        this.rollback();
                         break;
                     case 5:
-                        listAllCustomers();
+                        this.listAllCustomers();
                         break;
                     case 6:
                         System.out.println("Sistema desligando...");
@@ -57,6 +54,7 @@ public class BankCLI extends ColorANSI {
                 }
             } catch (Exception e) {
                 System.out.println(formatError("Opção inválida. Tente novamente.\n"));
+                System.err.println(formatError(e.getMessage()));
                 scanner.nextLine();
             }
         }
@@ -64,8 +62,6 @@ public class BankCLI extends ColorANSI {
     }
 
     private void addCustomer() {
-        int idCustomer = this.controller.findSize() + 1;
-
         System.out.println("\nDigite o nome do cliente:");
         String nameCustomer = scanner.nextLine();
 
@@ -78,9 +74,9 @@ public class BankCLI extends ColorANSI {
         System.out.println("\nDigite o email do cliente:");
         String emailCustomer = scanner.nextLine();
 
-        controller.addCustomer(idCustomer, nameCustomer, cpfCustomer, birthDateCustomer, emailCustomer);
+        controller.addCustomer(nameCustomer, cpfCustomer, birthDateCustomer, emailCustomer);
 
-        System.out.println(formatSuccess("\nCliente adicionado com sucesso.\n"));
+        System.out.println(this.formatSuccess("\nCliente adicionado com sucesso.\n"));
     }
 
     private void removeCustomer() {
@@ -88,8 +84,8 @@ public class BankCLI extends ColorANSI {
         while (!isStop) {
             System.out.println("\nDigite o ID do cliente que deseja remover:");
             try {
-                int id = scanner.nextInt();
-                scanner.nextLine();
+                int id = this.scanner.nextInt();
+                this.scanner.nextLine();
 
                 boolean isRemoved = controller.removeCustomer(id);
     
@@ -101,99 +97,70 @@ public class BankCLI extends ColorANSI {
                 isStop = true;
             } catch (java.util.InputMismatchException e) {
                 System.err.println(formatError("ID inválido. Tente novamente.\n"));
-                scanner.nextLine();
+                this.scanner.nextLine();
             }
         }
     }
 
     private void editCustomer(){
-        boolean running = true;
-        while (running) {
+        boolean isStop = false;
+
+        while (!isStop) {
             System.out.println("\nDigite o ID do cliente que deseja editar:");
             try {
-                int id = scanner.nextInt();
-                scanner.nextLine();
+                int id = this.scanner.nextInt();
+                this.scanner.nextLine();
 
-                NodeList customer = controller.findNodeCustomer(id);
+                Customer customer = this.controller.getCostumeById(id);
 
-                if (customer == null) {
+                if (customer != null) {
+                    System.out.println("\nCliente encontrado:");
+                    System.out.println(customer.getAllAttributes());
+                } else {
                     System.out.println(formatNotice("\nCliente não encontrado.\n"));
-                    return;
+                    isStop = true;
                 }
 
-                System.out.println("\nCliente encontrado:");
-                System.out.println(customer.customer.getAllAttributes());
+                System.out.println("\nDigite o novo nome do cliente:");
+                String newName = this.scanner.nextLine();
 
-                while (running) {
-                   EditChoice.main(null);
-                   try{
-                        int choice = scanner.nextInt();
-                        scanner.nextLine();
+                System.out.println("\nDigite o novo CPF do cliente:");
+                String newCPF = this.scanner.nextLine();
 
-                        switch (choice) {
-                            case 1:
-                                System.out.println("\nDigite o novo nome do cliente:");
-                                customer.customer.setName(scanner.nextLine());
-                                System.out.println(formatSuccess("Nome alterado com sucesso.\n"));
-                                running = false;
-                                break;
-                            case 2:
-                                System.out.println("\nDigite o novo CPF do cliente:");
-                                customer.customer.setCpf(scanner.nextLine());
-                                System.out.println(formatSuccess("CPF alterado com sucesso.\n"));
-                                running = false;
-                                break;
-                            case 3:
-                                System.out.println("\nDigite a nova data de nascimento (DD/MM/AAAA) do cliente:");
-                                customer.customer.setBirthDate(scanner.nextLine());
-                                System.out.println(formatSuccess("Data de nascimento alterado com sucesso.\n"));
-                                running = false;
-                                break;
-                            case 4:
-                                System.out.println("\nDigite o novo email do cliente:");
-                                System.out.println(formatSuccess("Email alterado com sucesso.\n"));
-                                customer.customer.setEmail(scanner.nextLine());
-                                running = false;
-                                break;
-                            case 5:
-                                System.out.println("\nDigite o novo nome do cliente:");
-                                customer.customer.setName(scanner.nextLine());
-                                System.out.println("\nDigite o novo CPF do cliente:");
-                                customer.customer.setCpf(scanner.nextLine());
-                                System.out.println("\nDigite a nova data de nascimento (DD/MM/AAAA) do cliente:");
-                                customer.customer.setBirthDate(scanner.nextLine());
-                                System.out.println("\nDigite o novo email do cliente:");
-                                customer.customer.setEmail(scanner.nextLine());
-                                System.out.println(formatSuccess("Todas as informações alteradas com sucesso.\n"));
-                                running = false;
-                                break;
-                            case 6:
-                                System.out.println(formatNotice("\nEdição cancelada.\n"));
-                                running = false;
-                                break;
-                            default:
-                                System.out.println(formatError("Opção inválida. Tente novamente.\n"));
-                        }
-                   } catch (java.util.InputMismatchException e) {
-                        System.err.println(formatError("Opção inválido. Tente novamente.\n"));
-                        scanner.nextLine();
-                    }
+                System.out.println("\nDigite a nova data de nascimento (DD/MM/AAAA) do cliente:");
+                String newBirthDate = this.scanner.nextLine();
+
+                System.out.println("\nDigite o novo email do cliente:");
+                String newEmail = this.scanner.nextLine();
+
+                boolean isEdited = this.controller.editCustomer(id, newName, newCPF, newBirthDate, newEmail, true);
+
+                if(isEdited){
+                    System.out.println(formatSuccess("Todas as informações alteradas com sucesso.\n"));
+                } else{
+                    System.out.println(formatSuccess("Ocorreu algum erro. Tente novamente.\n"));
                 }
+
+                isStop = true;
             } catch (java.util.InputMismatchException e) {
-                System.err.println(formatError("ID inválido. Tente novamente."));
-                scanner.nextLine();
+                System.err.println(formatError("ID inválido. Tente novamente.\n"));
+                this.scanner.nextLine();
             }
         }
     }
 
     private void rollback(){
-        System.out.println("asd");
-        controller.rollbackStack();
-        System.out.println(formatSuccess("Operação desfeita com sucesso\n"));
+        boolean isSuccess = this.controller.rollbackStack();
+
+        if (isSuccess) {
+            System.out.println(this.formatSuccess("Operação desfeita com sucesso\n"));
+        } else {
+            System.out.println(this.formatError("Nenhuma ação para desfazer\n"));
+        }
     }
 
     private void listAllCustomers() {
-        List<Customer> allConsumers = controller.getAllCustomer();
+        List<Customer> allConsumers = this.controller.getAllCustomer();
 
         if (allConsumers.isEmpty()) {
             System.out.println(formatNotice("Nenhum cliente cadastrado.\n"));
@@ -218,7 +185,7 @@ public class BankCLI extends ColorANSI {
             String birthDateCustomer = birthDatesCustomer[i];
             String emailCustomer = emailsCustomer[i];
 
-            controller.addCustomer(i + 1, nameCustomer, cpfCustomer, birthDateCustomer, emailCustomer);
+            this.controller.addCustomer(nameCustomer, cpfCustomer, birthDateCustomer, emailCustomer);
         }
     }
 }
