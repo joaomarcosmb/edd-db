@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AVLTree {
+    private AVLNode root;
+
     private class AVLNode {
         private String key;
         private List<Record> records;
@@ -17,157 +19,102 @@ public class AVLTree {
             this.key = key;
             this.records = new ArrayList<>();
             this.records.add(record);
+            this.height = 1;
+        }
+    }
+
+    public void insert(String key, Record record) {
+        root = insert(root, key, record);
+    }
+
+    private AVLNode insert(AVLNode node, String key, Record record) {
+        if (node == null) {
+            return new AVLNode(key, record);
         }
 
-        private AVLNode root;
-
-        public void insert(String key, Record record) {
-            root = insert(root, key, record);
+        if (key.equals(node.key)) {
+            node.records.add(record);
+        } else if (key.compareTo(node.key) < 0) {
+            node.leftChild = insert(node.leftChild, key, record);
+        } else {
+            node.rightChild = insert(node.rightChild, key, record);
         }
 
-        private AVLNode insert(AVLNode root, String key, Record record) {
-            if (root == null)
-                return new AVLNode(key, record);
+        setHeight(node);
 
-            var comparison = key.compareTo(root.key);
-            if (comparison < 0)
-                root.leftChild = insert(root.leftChild, key, record);
-            else if (comparison > 0)
-                root.rightChild = insert(root.rightChild, key, record);
-            else
-                root.records.add(record);
+        return balance(node);
+    }
 
-            updateHeight(root);
+    public List<Record> search(String key) {
+        AVLNode node = search(root, key);
+        return node != null ? new ArrayList<>(node.records) : new ArrayList<>();
+    }
 
-            return balance(root, key);
+    private AVLNode search(AVLNode node, String key) {
+        if (node == null || key.equals(node.key)) {
+            return node;
         }
 
-        public List<Record> search(String key) {
-            AVLNode node = search(root, key);
-            return (node != null) ? new ArrayList<>(node.records) : new ArrayList<>();
+        if (key.compareTo(node.key) < 0) {
+            return search(node.leftChild, key);
         }
+        return search(node.rightChild, key);
+    }
 
-        private AVLNode search(AVLNode root, String key) {
-            if (root == null || root.key.equals(key))
-                return root;
-
-            if (key.compareTo(root.key) < 0)
-                return search(root.leftChild, key);
-
-            return search(root.rightChild, key);
+    private AVLNode balance(AVLNode root) {
+        if (isLeftHeavy(root)) {
+            if (getBalance(root.leftChild) < 0)
+                root.leftChild = rotateLeft(root.leftChild);
+            return rotateRight(root);
+        } else if (isRightHeavy(root)) {
+            if (getBalance(root.rightChild) > 0)
+                root.rightChild = rotateRight(root.rightChild);
+            return rotateLeft(root);
         }
+        return root;
+    }
 
-        public void delete(String key) {
-            root = delete(root, key);
-        }
+    private AVLNode rotateLeft(AVLNode root) {
+        var newRoot = root.rightChild;
+        root.rightChild = newRoot.leftChild;
+        newRoot.leftChild = root;
 
-        private AVLNode delete(AVLNode root, String key) {
-            if (root == null)
-                return null;
+        setHeight(root);
+        setHeight(newRoot);
 
-            var comparison = key.compareTo(root.key);
-            if (comparison < 0)
-                root.leftChild = delete(root.leftChild, key);
-            else if (comparison > 0)
-                root.rightChild = delete(root.rightChild, key);
-            else {
-                // Caso 1: Nó com um ou nenhum filho
-                if (root.leftChild == null || root.rightChild == null) {
-                    AVLNode temp = null;
-                    if (temp == root.leftChild)
-                        temp = root.rightChild;
-                    else
-                        temp = root.leftChild;
+        return newRoot;
+    }
 
-                    if (temp == null) {
-                        temp = root;
-                        root = null;
-                    } else
-                        root = temp;
-                } else {
-                    // Caso 2: Nó com dois filhos
-                    AVLNode temp = findMin(root.rightChild);
-                    root.key = temp.key;
-                    root.records = temp.records;
-                    root.rightChild = delete(root.rightChild, temp.key);
-                }
-            }
+    private AVLNode rotateRight(AVLNode root) {
+        var newRoot = root.leftChild;
+        root.leftChild = newRoot.rightChild;
+        newRoot.rightChild = root;
 
-            if (root == null)
-                return root;
+        setHeight(root);
+        setHeight(newRoot);
 
-            updateHeight(root);
+        return newRoot;
+    }
 
-            return balance(root, key);
-        }
+    private int getHeight(AVLNode node) {
+        if (node == null) return 0;
+        return node.height;
+    }
 
-        private AVLNode balance(AVLNode root, String key) {
-            if (isLeftHeavy(root)) {
-                if (key.compareTo(root.leftChild.key) < 0) // Esquerda-Esquerda
-                    return rightRotate(root);
-                else { // Esquerda-Direita
-                    root.leftChild = leftRotate(root.leftChild);
-                    return rightRotate(root);
-                }
-            }
-            if (isRightHeavy(root)) {
-                if (key.compareTo(root.rightChild.key) > 0) // Direita-Direita
-                    return leftRotate(root);
-                else { // Direita-Esquerda
-                    root.rightChild = rightRotate(root.rightChild);
-                    return leftRotate(root);
-                }
-            }
-            return root;
-        }
+    private void setHeight(AVLNode node) {
+        node.height = Math.max(getHeight(node.leftChild), getHeight(node.rightChild)) + 1;
+    }
 
-        private int height(AVLNode node) {
-            return (node == null) ? -1 : node.height;
-        }
+    private int getBalance(AVLNode node) {
+        if (node == null) return 0;
+        return getHeight(node.leftChild) - getHeight(node.rightChild);
+    }
 
-        private void updateHeight(AVLNode node) {
-            node.height = Math.max(height(node.leftChild), height(node.rightChild)) + 1;
-        }
+    private boolean isLeftHeavy(AVLNode node) {
+        return getBalance(node) > 1;
+    }
 
-        private boolean isLeftHeavy(AVLNode node) {
-            return balanceFactor(node) > 1;
-        }
-
-        private boolean isRightHeavy(AVLNode node) {
-            return balanceFactor(node) < -1;
-        }
-
-        private int balanceFactor(AVLNode node) {
-            return (node == null) ? 0 : height(root.leftChild) - height(root.rightChild);
-        }
-
-        private AVLNode leftRotate(AVLNode node) {
-            var newRoot = node.rightChild;
-            node.rightChild = newRoot.leftChild;
-            newRoot.leftChild = node;
-
-            node.height = Math.max(height(node.leftChild), height(node.rightChild)) + 1;
-            newRoot.height = Math.max(height(newRoot.leftChild), height(newRoot.rightChild)) + 1;
-
-            return newRoot;
-        }
-
-        private AVLNode rightRotate(AVLNode node) {
-            var newRoot = node.leftChild;
-            node.leftChild = newRoot.rightChild;
-            newRoot.rightChild = node;
-
-            node.height = Math.max(height(node.leftChild), height(node.rightChild)) + 1;
-            newRoot.height = Math.max(height(newRoot.leftChild), height(newRoot.rightChild)) + 1;
-
-            return newRoot;
-        }
-
-        private AVLNode findMin(AVLNode root) {
-            AVLNode current = root;
-            while (current.leftChild != null)
-                current = current.leftChild;
-            return current;
-        }
+    private boolean isRightHeavy(AVLNode node) {
+        return getBalance(node) < -1;
     }
 }
