@@ -89,14 +89,15 @@ public class LinkedList {
     }
 
     public NodeList getLastNode() {
+        if (this.head == null) {
+            return null;
+        }
+        
         NodeList temp = this.head;
-
-        while (temp != null) {
+        while (temp.next != null) {
             temp = temp.next;
         }
-
         return temp;
-
     }
 
     public NodeList getPreviousNode(int id) {

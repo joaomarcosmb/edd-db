@@ -8,7 +8,9 @@ public class HomeChoice {
         System.out.println("3. Atualizar cliente");
         System.out.println("4. Rollback");
         System.out.println("5. Listar todos os clientes");
-        System.out.println("6. Exit");
+        System.out.println("6. Buscar por cliente");
+        System.out.println("7. Adicionar consulta complexa");
+        System.out.println("8. Sair");
         System.out.println();
     }
 }
