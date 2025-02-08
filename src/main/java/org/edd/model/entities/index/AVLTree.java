@@ -97,7 +97,8 @@ public class AVLTree {
     }
 
     private int getHeight(AVLNode node) {
-        if (node == null) return 0;
+        if (node == null)
+            return 0;
         return node.height;
     }
 
@@ -106,7 +107,8 @@ public class AVLTree {
     }
 
     private int getBalance(AVLNode node) {
-        if (node == null) return 0;
+        if (node == null)
+            return 0;
         return getHeight(node.leftChild) - getHeight(node.rightChild);
     }
 

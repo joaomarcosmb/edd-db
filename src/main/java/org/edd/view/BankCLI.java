@@ -304,11 +304,12 @@ public class BankCLI extends ColorANSI {
     }
 
     private void TESTE() {
-        String[] namesCustomer = {"Carlos Souza", "Mariana Silva", "João Pereira", "Ana Santos"};
-        String[] cpfsCustomer = {"123.456.789-01", "987.654.321-02", "456.789.123-03", "321.654.987-04"};
-        String[] birthDatesCustomer = {"10/03/1985", "24/06/1990", "15/11/1978", "30/01/2002"};
-        String[] emailsCustomer = {"carlos.souza@example.com", "mariana.silva@example.com", "joao.pereira@example.com", "ana.santos@example.com"};
-        
+        String[] namesCustomer = { "Carlos Souza", "Mariana Silva", "João Pereira", "Ana Santos" };
+        String[] cpfsCustomer = { "123.456.789-01", "987.654.321-02", "456.789.123-03", "321.654.987-04" };
+        String[] birthDatesCustomer = { "10/03/1985", "24/06/1990", "15/11/1978", "30/01/2002" };
+        String[] emailsCustomer = { "carlos.souza@example.com", "mariana.silva@example.com", "joao.pereira@example.com",
+                "ana.santos@example.com" };
+
         for (int i = 0; i < namesCustomer.length; i++) {
             String nameCustomer = namesCustomer[i];
             String cpfCustomer = cpfsCustomer[i];

@@ -73,20 +73,20 @@ public class QueryQueue {
     public void reindexRecord(int id, Map<String, Object> values) {
         Record record = new Record();
         record.setValue("id", id);
-        
+
         // First store all values in the record
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             String value = String.valueOf(entry.getValue());
             record.setValue(entry.getKey(), value);
         }
-        
+
         // Then index the record in all trees
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             String value = String.valueOf(entry.getValue()).toLowerCase();
             AVLTree tree = indexTrees.computeIfAbsent(entry.getKey(), k -> new AVLTree());
             tree.insert(value, record);
         }
-        
+
         records.put(id, record);
     }
 
@@ -160,18 +160,18 @@ public class QueryQueue {
         if (tree == null) {
             return new ArrayList<>();
         }
-        
+
         List<Record> results = new ArrayList<>();
         String startStr = String.valueOf(start);
         String endStr = String.valueOf(end);
-        
+
         for (Record record : records.values()) {
             String value = String.valueOf(record.getValue(field));
             if (value.compareTo(startStr) >= 0 && value.compareTo(endStr) <= 0) {
                 results.add(record);
             }
         }
-        
+
         return results;
     }
 }
