@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 public class BankCLI extends ColorANSI {
     private final SystemController controller;
@@ -173,18 +174,42 @@ public class BankCLI extends ColorANSI {
     }
 
     private void listAllCustomers() {
-        List<Customer> allConsumers = this.controller.getAllCustomer();
+        List<Customer> allCustomers = this.controller.getAllCustomer();
 
-        if (allConsumers.isEmpty()) {
+        if (allCustomers.isEmpty()) {
             System.out.println(formatNotice("Nenhum cliente cadastrado.\n"));
             return;
         }
 
-        for (Customer consumer : allConsumers) {
-            System.out.println(consumer.getAllAttributes());
+        printCustomerTree(allCustomers, 0, "Root: ");
+        System.out.println();
+    }
+
+    private void printCustomerTree(List<Customer> customers, int level, String prefix) {
+        if (customers.isEmpty()) {
+            return;
         }
 
-        System.out.println();
+        Customer root = customers.getFirst();
+        System.out.println("  ".repeat(level) + prefix + "[Conta: " + root.getId() + ", Nome: " + root.getName() + "]");
+
+        List<Customer> leftSubtree = new ArrayList<>();
+        List<Customer> rightSubtree = new ArrayList<>();
+        
+        for (int i = 1; i < customers.size(); i++) {
+            if (customers.get(i).getName().compareTo(root.getName()) < 0) {
+                leftSubtree.add(customers.get(i));
+            } else {
+                rightSubtree.add(customers.get(i));
+            }
+        }
+
+        if (!leftSubtree.isEmpty()) {
+            printCustomerTree(leftSubtree, level + 1, "L--- ");
+        }
+        if (!rightSubtree.isEmpty()) {
+            printCustomerTree(rightSubtree, level + 1, "R--- ");
+        }
     }
 
     private void searchCustomers() {
