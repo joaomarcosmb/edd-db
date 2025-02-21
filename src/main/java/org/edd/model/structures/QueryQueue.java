@@ -5,6 +5,8 @@ import org.edd.model.entities.index.AVLTree;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class QueryQueue {
     private final Queue<Query> queryQueue;
@@ -165,10 +167,28 @@ public class QueryQueue {
         String startStr = String.valueOf(start);
         String endStr = String.valueOf(end);
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
         for (Record record : records.values()) {
             String value = String.valueOf(record.getValue(field));
-            if (value.compareTo(startStr) >= 0 && value.compareTo(endStr) <= 0) {
-                results.add(record);
+            
+            if (field.equals("birthDate")) {
+                try {
+                    LocalDate valueDate = LocalDate.parse(value, formatter);
+                    LocalDate startDate = LocalDate.parse(startStr, formatter);
+                    LocalDate endDate = LocalDate.parse(endStr, formatter);
+                    
+                    if (!valueDate.isBefore(startDate) && !valueDate.isAfter(endDate)) {
+                        results.add(record);
+                    }
+                } catch (Exception e) {
+                    // Skip invalid dates
+                    continue;
+                }
+            } else {
+                if (value.compareTo(startStr) >= 0 && value.compareTo(endStr) <= 0) {
+                    results.add(record);
+                }
             }
         }
 

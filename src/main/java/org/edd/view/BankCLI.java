@@ -266,47 +266,138 @@ public class BankCLI extends ColorANSI {
         ComplexQueryChoice.main(null);
 
         try {
-            int operatorChoice = scanner.nextInt();
+            int searchTypeChoice = scanner.nextInt();
             scanner.nextLine();
 
-            String operator = operatorChoice == 1 ? "AND" : "OR";
-            Map<String, Object> criteria = new HashMap<>();
-
-            boolean addingCriteria = true;
-            while (addingCriteria) {
-                ComplexQueryChoice.criteriaMenu();
-
-                int choice = scanner.nextInt();
-                scanner.nextLine();
-
-                if (choice == 4) {
-                    addingCriteria = false;
-                } else if (choice >= 1 && choice <= 3) {
-                    System.out.println("\nDigite o valor para busca:");
-                    String searchValue = scanner.nextLine().trim();
-
-                    switch (choice) {
-                        case 1:
-                            criteria.put("name", searchValue.toLowerCase());
-                            break;
-                        case 2:
-                            criteria.put("cpf", searchValue);
-                            break;
-                        case 3:
-                            criteria.put("email", searchValue.toLowerCase());
-                            break;
-                    }
-                } else {
-                    System.out.println(formatError("Opção inválida"));
-                }
-            }
-
-            if (criteria.isEmpty()) {
-                System.out.println(formatNotice("\nNenhum critério de busca foi especificado.\n"));
+            if (searchTypeChoice == 3) {
                 return;
             }
 
-            List<Record> results = controller.searchComplex(criteria, operator);
+            List<Record> results = new ArrayList<>();
+
+            if (searchTypeChoice == 1) {
+                ComplexQueryChoice.operatorMenu();
+                int operatorChoice = scanner.nextInt();
+                scanner.nextLine();
+
+                String operator = operatorChoice == 1 ? "AND" : "OR";
+                List<Record> finalResults = null;
+
+                boolean addingCriteria = true;
+                while (addingCriteria) {
+                    ComplexQueryChoice.criteriaMenu();
+
+                    int criteriaType = scanner.nextInt();
+                    scanner.nextLine();
+
+                    if (criteriaType == 3) {
+                        addingCriteria = false;
+                    } else if (criteriaType >= 1 && criteriaType <= 2) {
+                        List<Record> criteriaResults = new ArrayList<>();
+                        
+                        if (criteriaType == 1) {
+                            ComplexQueryChoice.fieldMenu();
+                            
+                            int fieldChoice = scanner.nextInt();
+                            scanner.nextLine();
+
+                            String field;
+                            switch (fieldChoice) {
+                                case 1:
+                                    field = "name";
+                                    break;
+                                case 2:
+                                    field = "cpf";
+                                    break;
+                                case 3:
+                                    field = "email";
+                                    break;
+                                default:
+                                    System.out.println(formatError("Opção inválida"));
+                                    continue;
+                            }
+
+                            System.out.println("\nDigite o valor para busca:");
+                            String searchValue = scanner.nextLine().trim().toLowerCase();
+                            Map<String, Object> criteria = new HashMap<>();
+                            criteria.put(field, searchValue);
+                            criteriaResults = controller.searchComplex(criteria, "AND");
+                        } else {
+                            System.out.println("\nDigite a data inicial (DD/MM/AAAA):");
+                            String startDate = scanner.nextLine().trim();
+                            System.out.println("Digite a data final (DD/MM/AAAA):");
+                            String endDate = scanner.nextLine().trim();
+                            criteriaResults = controller.searchByRange("birthDate", startDate, endDate);
+                        }
+
+                        if (finalResults == null) {
+                            finalResults = new ArrayList<>(criteriaResults);
+                        } else {
+                            List<Record> tempResults = new ArrayList<>(finalResults);
+                            finalResults.clear();
+                            
+                            if ("AND".equals(operator)) {
+                                // Keep only records that exist in both lists
+                                for (Record record : tempResults) {
+                                    if (criteriaResults.stream().anyMatch(r -> 
+                                        r.getValue("id").equals(record.getValue("id")))) {
+                                        finalResults.add(record);
+                                    }
+                                }
+                            } else {
+                                // Add all unique records
+                                finalResults.addAll(tempResults);
+                                for (Record record : criteriaResults) {
+                                    if (tempResults.stream().noneMatch(r -> 
+                                        r.getValue("id").equals(record.getValue("id")))) {
+                                        finalResults.add(record);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                results = finalResults != null ? finalResults : new ArrayList<>();
+            } else if (searchTypeChoice == 2) {
+                ComplexQueryChoice.criteriaMenu();
+                int criteriaType = scanner.nextInt();
+                scanner.nextLine();
+
+                if (criteriaType == 1) {
+                    ComplexQueryChoice.fieldMenu();
+                    
+                    int fieldChoice = scanner.nextInt();
+                    scanner.nextLine();
+
+                    String field;
+                    switch (fieldChoice) {
+                        case 1:
+                            field = "name";
+                            break;
+                        case 2:
+                            field = "cpf";
+                            break;
+                        case 3:
+                            field = "email";
+                            break;
+                        default:
+                            System.out.println(formatError("Opção inválida"));
+                            return;
+                    }
+
+                    System.out.println("\nDigite o valor para busca:");
+                    String searchValue = scanner.nextLine().trim().toLowerCase();
+                    Map<String, Object> criteria = new HashMap<>();
+                    criteria.put(field, searchValue);
+                    results = controller.searchComplex(criteria, "AND");
+                } else if (criteriaType == 2) {
+                    System.out.println("\nDigite a data inicial (DD/MM/AAAA):");
+                    String startDate = scanner.nextLine().trim();
+                    System.out.println("Digite a data final (DD/MM/AAAA):");
+                    String endDate = scanner.nextLine().trim();
+                    results = controller.searchByRange("birthDate", startDate, endDate);
+                }
+            }
 
             if (results.isEmpty()) {
                 System.out.println(formatNotice("\nNenhum cliente encontrado com os critérios especificados.\n"));
