@@ -1,7 +1,7 @@
 package org.edd.model.structures;
 
 import org.edd.model.entities.Record;
-import org.edd.model.entities.index.AVLTree;
+import org.edd.model.structures.index.AVLTree;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;

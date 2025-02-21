@@ -1,4 +1,4 @@
-package org.edd.model.entities.index;
+package org.edd.model.structures.index;
 
 import org.edd.model.entities.Record;
 

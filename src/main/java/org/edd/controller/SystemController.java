@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.edd.model.entities.Customer;
-import org.edd.model.entities.ActionsStack;
+import org.edd.model.structures.ActionsStack;
 import org.edd.model.entities.Record;
-import org.edd.model.entities.LinkedList;
+import org.edd.model.structures.LinkedList;
 import org.edd.model.structures.NodeList;
 import org.edd.model.structures.NodeStack;
 import org.edd.model.structures.QueryQueue;

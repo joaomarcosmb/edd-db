@@ -1,9 +1,9 @@
-package org.edd.model.entities;
+package org.edd.model.structures;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.edd.model.structures.NodeList;
+import org.edd.model.entities.Customer;
 
 public class LinkedList {
     protected NodeList head;
