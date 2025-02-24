@@ -190,7 +190,7 @@ public class BankCLI extends ColorANSI {
             return;
         }
 
-        Customer root = customers.getFirst();
+        Customer root = customers.get(0);
         System.out.println("  ".repeat(level) + prefix + "[Conta: " + root.getId() + ", Nome: " + root.getName() + "]");
 
         List<Customer> leftSubtree = new ArrayList<>();
