@@ -47,7 +47,7 @@ Para instalar o Java JDK 17.0.12, siga os passos abaixo:
     Caso o comando retorne a versão do Java corretamente, significa que a instalação foi bem-sucedida.
 
 
-Se houver algum problema com a instalação, verifique sua máquina e tente novamente. Após confirmar que tudo está funcionando corretamente, prossiga para a execução do seu sistema.
+Se houver algum problema com a instalação, verifique sua máquina e tente novamente. Após confirmar que tudo está funcionando corretamente, prossiga para a execução do programa.
 
 ## 🔧 Como Executar
 
