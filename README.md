@@ -25,7 +25,7 @@ src/
 
 Para executar este projeto, você precisará ter instalado em sua máquina:
 
-- Java JDK 11 ou superior
+- Java JDK 21 ou superior
 - Gradle 7.x ou superior
 
 ## 🔧 Como Executar
